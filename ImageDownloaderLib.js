@@ -29,7 +29,7 @@
   let panelElement = null;
 
   // svg icons
-  const externalLinkSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentcolor" width="16" height="16"><path fill-rule="evenodd" d="M10.604 1h4.146a.25.25 0 01.25.25v4.146a.25.25 0 01-.427.177L13.03 4.03 9.28 7.78a.75.75 0 01-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0110.604 1zM3.75 2A1.75 1.75 0 002 3.75v8.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 12.25v-3.5a.75.75 0 00-1.5 0v3.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-8.5a.25.25 0 01.25-.25h3.5a.75.75 0 000-1.5h-3.5z"></path></svg>`;  
+  const externalLinkSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentcolor" width="16" height="16"><path fill-rule="evenodd" d="M10.604 1h4.146a.25.25 0 01.25.25v4.146a.25.25 0 01-.427.177L13.03 4.03 9.28 7.78a.75.75 0 01-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0110.604 1zM3.75 2A1.75 1.75 0 002 3.75v8.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 12.25v-3.5a.75.75 0 00-1.5 0v3.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-8.5a.25.25 0 01.25-.25h3.5a.75.75 0 000-1.5h-3.5z"></path></svg>`;
   const reloadSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentcolor" width="16" height="16"><path fill-rule="evenodd" d="M8 2.5a5.487 5.487 0 00-4.131 1.869l1.204 1.204A.25.25 0 014.896 6H1.25A.25.25 0 011 5.75V2.104a.25.25 0 01.427-.177l1.38 1.38A7.001 7.001 0 0114.95 7.16a.75.75 0 11-1.49.178A5.501 5.501 0 008 2.5zM1.705 8.005a.75.75 0 01.834.656 5.501 5.501 0 009.592 2.97l-1.204-1.204a.25.25 0 01.177-.427h3.646a.25.25 0 01.25.25v3.646a.25.25 0 01-.427.177l-1.38-1.38A7.001 7.001 0 011.05 8.84a.75.75 0 01.656-.834z"></path></svg>`;
 
   // initialization
@@ -37,7 +37,7 @@
     maxImageAmount,
     getImagePromises,
     title = `package_${Date.now()}`,
-    imageSuffix = 'webp', // Change 'jpg' to 'webp'
+    imageSuffix = 'jpg',
     zipOptions = {},
     positionOptions = {}
   }) {
@@ -47,15 +47,15 @@
     // setup UI
     setupUI(positionOptions);
 
-    // // setup update notification
-    // setupUpdateNotification();
+    // setup update notification
+    setupUpdateNotification();
 
     // add click event listener to download button
     downloadButtonElement.onclick = function () {
       if (!isOKToDownload()) return;
 
       this.disabled = true;
-      this.textContent = "Procesando";
+      this.textContent = "Processing";
       this.style.backgroundColor = '#aaa';
       this.style.cursor = 'not-allowed';
       download(getImagePromises, title, imageSuffix, zipOptions);
@@ -99,7 +99,7 @@
     // create 'to' span element
     const toSpanElement = document.createElement('span');
     toSpanElement.id = 'ImageDownloader-ToSpan';
-    toSpanElement.textContent = 'a';
+    toSpanElement.textContent = 'to';
     toSpanElement.style = `
       margin: 0 6px;
       color: black;
@@ -185,75 +185,75 @@
     document.body.appendChild(panelElement);
   }
 
-  // // setup update notification
-  // async function setupUpdateNotification() {
-  //   if (typeof GM_info === 'undefined' || typeof GM_xmlhttpRequest === 'undefined') return;
+  // setup update notification
+  async function setupUpdateNotification() {
+    if (typeof GM_info === 'undefined' || typeof GM_xmlhttpRequest === 'undefined') return;
 
-  //   // get local version
-  //   const localVersion = Number(GM_info.script.version);
+    // get local version
+    const localVersion = Number(GM_info.script.version);
 
-  //   // get latest version
-  //   const scriptID = (GM_info.script.homepageURL || GM_info.script.homepage).match(/scripts\/(?<id>\d+)-/)?.groups?.id;
-  //   const scriptURL = `https://update.greasyfork.org/scripts/${scriptID}/raw.js`;
-  //   const latestVersionString = await new Promise(resolve => {
-  //     GM_xmlhttpRequest({
-  //       method: 'GET',
-  //       url: scriptURL,
-  //       responseType: 'text',
-  //       onload: res => resolve(res.response.match(/@version\s+(?<version>[0-9\.]+)/)?.groups?.version)
-  //     });
-  //   });
-  //   const latestVersion = Number(latestVersionString);
+    // get latest version
+    const scriptID = (GM_info.script.homepageURL || GM_info.script.homepage).match(/scripts\/(?<id>\d+)-/)?.groups?.id;
+    const scriptURL = `https://update.greasyfork.org/scripts/${scriptID}/raw.js`;
+    const latestVersionString = await new Promise(resolve => {
+      GM_xmlhttpRequest({
+        method: 'GET',
+        url: scriptURL,
+        responseType: 'text',
+        onload: res => resolve(res.response.match(/@version\s+(?<version>[0-9\.]+)/)?.groups?.version)
+      });
+    });
+    const latestVersion = Number(latestVersionString);
 
-  //   if (Number.isNaN(localVersion) || Number.isNaN(latestVersion)) return;
-  //   if (latestVersion <= localVersion) return;
+    if (Number.isNaN(localVersion) || Number.isNaN(latestVersion)) return;
+    if (latestVersion <= localVersion) return;
 
-  //   // show update notification
-  //   const updateLinkElement = document.createElement('a');
-  //   updateLinkElement.id = 'ImageDownloader-UpdateLink';
-  //   updateLinkElement.href = scriptURL.replace('raw.js', 'raw.user.js');
-  //   updateLinkElement.innerHTML = `Actualizado a V${latestVersionString}${externalLinkSVG}`;
-  //   updateLinkElement.style = `
-  //     position: absolute;
-  //     bottom: -38px;
-  //     left: -1px;
+    // show update notification
+    const updateLinkElement = document.createElement('a');
+    updateLinkElement.id = 'ImageDownloader-UpdateLink';
+    updateLinkElement.href = scriptURL.replace('raw.js', 'raw.user.js');
+    updateLinkElement.innerHTML = `Update to V${latestVersionString}${externalLinkSVG}`;
+    updateLinkElement.style = `
+      position: absolute;
+      bottom: -38px;
+      left: -1px;
 
-  //     display: flex;
-  //     justify-content: space-around;
-  //     align-items: center;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
 
-  //     box-sizing: border-box;
-  //     padding: 8px;
-  //     width: 146px;
-  //     height: 32px;
+      box-sizing: border-box;
+      padding: 8px;
+      width: 146px;
+      height: 32px;
 
-  //     font-size: 14px;
-  //     font-family: 'Consolas', 'Monaco', 'Microsoft YaHei';
-  //     text-decoration: none;
-  //     color: white;
+      font-size: 14px;
+      font-family: 'Consolas', 'Monaco', 'Microsoft YaHei';
+      text-decoration: none;
+      color: white;
 
-  //     background-color: #32CD32;
-  //     border-radius: 4px;
-  //   `;
-  //   updateLinkElement.onclick = () => setTimeout(() => {
-  //     updateLinkElement.removeAttribute('href');
-  //     updateLinkElement.innerHTML = `Vuelva a cargar${reloadSVG}`;
-  //     updateLinkElement.style.cursor = 'default';
-  //   }, 1000);
+      background-color: #32CD32;
+      border-radius: 4px;
+    `;
+    updateLinkElement.onclick = () => setTimeout(() => {
+      updateLinkElement.removeAttribute('href');
+      updateLinkElement.innerHTML = `Please Reload${reloadSVG}`;
+      updateLinkElement.style.cursor = 'default';
+    }, 1000);
 
-  //   panelElement.appendChild(updateLinkElement);
-  // }
+    panelElement.appendChild(updateLinkElement);
+  }
 
   // check validity of page nums from input
   function isOKToDownload() {
     const startNum = Number(startNumInputElement.value);
     const endNum = Number(endNumInputElement.value);
 
-    if (Number.isNaN(startNum) || Number.isNaN(endNum)) { alert("请正确输入数值\nIntroduzca correctamente el número de página."); return false; }
-    if (!Number.isInteger(startNum) || !Number.isInteger(endNum)) { alert("请正确输入数值\nIntroduzca correctamente el número de página."); return false; }
-    if (startNum < 1 || endNum < 1) { alert("页码的值不能小于1\nEl número de página no debe ser inferior a 1."); return false; }
-    if (startNum > maxNum || endNum > maxNum) { alert(`页码的值不能大于${maxNum}\nEl número de página no debe ser mayor que ${maxNum}.`); return false; }
-    if (startNum > endNum) { alert("起始页码的值不能大于终止页码的值\nEl número de inicial no debe ser mayor que el número final."); return false; }
+    if (Number.isNaN(startNum) || Number.isNaN(endNum)) { alert("请正确输入数值\nPlease enter page number correctly."); return false; }
+    if (!Number.isInteger(startNum) || !Number.isInteger(endNum)) { alert("请正确输入数值\nPlease enter page number correctly."); return false; }
+    if (startNum < 1 || endNum < 1) { alert("页码的值不能小于1\nPage number should not smaller than 1."); return false; }
+    if (startNum > maxNum || endNum > maxNum) { alert(`页码的值不能大于${maxNum}\nPage number should not bigger than ${maxNum}.`); return false; }
+    if (startNum > endNum) { alert("起始页码的值不能大于终止页码的值\nNumber of start should not bigger than number of end."); return false; }
 
     return true;
   }
@@ -283,30 +283,41 @@
     const zipTitle = title.replaceAll(/\/|\\|\:|\*|\?|\"|\<|\>|\|/g, ''); // remove some characters
     const folder = zip.folder(zipTitle);
     for (const [index, image] of images.entries()) {
-      const filename = `${String(index + 1).padStart(images.length >= 100 ? String(images.length).length : 2, '0')}.webp`; // Use webp
+      const filename = `${String(index + 1).padStart(images.length >= 100 ? String(images.length).length : 2, '0')}.${imageSuffix}`;
       folder.file(filename, image, zipOptions);
     }
 
     // start zipping & show progress
-    const zipProgressHandler = (metadata) => { downloadButtonElement.innerHTML = `Empaquetando<br>(${metadata.percent.toFixed()}%)`; };
-    const zipBlob = await zip.generateAsync({ type: "blob", progress: zipProgressHandler });
+    const zipProgressHandler = (metadata) => { downloadButtonElement.innerHTML = `Zipping<br>(${metadata.percent.toFixed()}%)`; }
+    const content = await zip.generateAsync({ type: "blob" }, zipProgressHandler);
 
-    // save zip file
-    saveAs(zipBlob, `${zipTitle}.zip`);
+    // open 'Save As' window to save
+    saveAs(content, `${zipTitle}.zip`);
+
+    // all completed
+    downloadButtonElement.textContent = "Completed";
   }
 
-  return { init }
-})(window.JSZip, window.saveAs);
+  // handle promise fulfilled
+  function fulfillHandler(res) {
+    if (!isErrorOccurred) {
+      fulfillCount++;
+      downloadButtonElement.innerHTML = `Processing<br>(${fulfillCount}/${promiseCount})`;
+    }
 
-// Example usage of the ImageDownloader
-ImageDownloader.init({
-  maxImageAmount: 100,  // Replace with your total number of images
-  getImagePromises: (from, to) => { 
-    // Your function to fetch image promises goes here
-    return fetchImages(from, to);  // Example placeholder function
-  },
-  title: "my_images", 
-  imageSuffix: 'webp',
-  zipOptions: {},
-  positionOptions: { top: '100px', left: '50px' }
-});
+    return res;
+  }
+
+  // handle promise rejected
+  function rejectHandler(err) {
+    isErrorOccurred = true;
+    console.error(err);
+
+    downloadButtonElement.textContent = 'Error Occurred';
+    downloadButtonElement.style.backgroundColor = 'red';
+
+    return Promise.reject(err);
+  }
+
+  return { init, fulfillHandler, rejectHandler };
+})(window);
