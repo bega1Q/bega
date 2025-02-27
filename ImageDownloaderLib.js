@@ -1,14 +1,34 @@
+/*
+ * Dependencies:
+ *
+ * GM_info(optional)
+ * Docs: https://violentmonkey.github.io/api/gm/#gm_info
+ * 
+ * GM_xmlhttpRequest(optional)
+ * Docs: https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest
+ *
+ * JSZIP
+ * Github: https://github.com/Stuk/jszip
+ * CDN: https://unpkg.com/jszip@3.7.1/dist/jszip.min.js
+ *
+ * FileSaver
+ * Github: https://github.com/eligrey/FileSaver.js
+ * CDN: https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js
+ */
+
 ;const ImageDownloader = (({ JSZip, saveAs }) => {
   let maxNum = 0;
   let promiseCount = 0;
   let fulfillCount = 0;
   let isErrorOccurred = false;
 
+  // elements
   let startNumInputElement = null;
   let endNumInputElement = null;
   let downloadButtonElement = null;
   let panelElement = null;
 
+  // initialization
   function init({
     maxImageAmount,
     getImagePromises,
@@ -48,7 +68,7 @@
 
     JSZip.defaults.date = new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000);
     const zip = new JSZip();
-    const zipTitle = title.replaceAll(/\/:*?"<>|/g, '');
+    const zipTitle = title.replaceAll(/\/|\\|\:|\*|\?|\"|\<|\>|\|/g, '');
     const folder = zip.folder(zipTitle);
 
     for (const [index, image] of images.entries()) {
