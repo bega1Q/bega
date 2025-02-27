@@ -29,7 +29,7 @@
   let panelElement = null;
 
   // svg icons
-  const externalLinkSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentcolor" width="16" height="16"><path fill-rule="evenodd" d="M10.604 1h4.146a.25.25 0 01.25.25v4.146a.25.25 0 01-.427.177L13.03 4.03 9.28 7.78a.75.75 0 01-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0110.604 1zM3.75 2A1.75 1.75 0 002 3.75v8.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 12.25v-3.5a.75.75 0 00-1.5 0v3.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-8.5a.25.25 0 01.25-.25h3.5a.75.75 0 000-1.5h-3.5z"></path></svg>`;  
+  const externalLinkSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentcolor" width="16" height="16"><path fill-rule="evenodd" d="M10.604 1h4.146a.25.25 0 01.25.25v4.146a.25.25 0 01-.427.177L13.03 4.03 9.28 7.78a.75.75 0 01-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0110.604 1zM3.75 2A1.75 1.75 0 002 3.75v8.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 12.25v-3.5a.75.75 0 00-1.5 0v3.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-8.5a.25.25 0 01.25-.25h3.5a.75.75 0 000-1.5h-3.5z"></path></svg>`;
   const reloadSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentcolor" width="16" height="16"><path fill-rule="evenodd" d="M8 2.5a5.487 5.487 0 00-4.131 1.869l1.204 1.204A.25.25 0 014.896 6H1.25A.25.25 0 011 5.75V2.104a.25.25 0 01.427-.177l1.38 1.38A7.001 7.001 0 0114.95 7.16a.75.75 0 11-1.49.178A5.501 5.501 0 008 2.5zM1.705 8.005a.75.75 0 01.834.656 5.501 5.501 0 009.592 2.97l-1.204-1.204a.25.25 0 01.177-.427h3.646a.25.25 0 01.25.25v3.646a.25.25 0 01-.427.177l-1.38-1.38A7.001 7.001 0 011.05 8.84a.75.75 0 01.656-.834z"></path></svg>`;
 
   // initialization
@@ -37,7 +37,7 @@
     maxImageAmount,
     getImagePromises,
     title = `package_${Date.now()}`,
-    imageSuffix = 'webp', // Change 'jpg' to 'webp'
+    imageSuffix = 'webp',
     zipOptions = {},
     positionOptions = {}
   }) {
@@ -283,30 +283,41 @@
     const zipTitle = title.replaceAll(/\/|\\|\:|\*|\?|\"|\<|\>|\|/g, ''); // remove some characters
     const folder = zip.folder(zipTitle);
     for (const [index, image] of images.entries()) {
-      const filename = `${String(index + 1).padStart(images.length >= 100 ? String(images.length).length : 2, '0')}.webp`; // Use webp
+      const filename = `${String(index + 1).padStart(images.length >= 100 ? String(images.length).length : 2, '0')}.${imageSuffix}`;
       folder.file(filename, image, zipOptions);
     }
 
     // start zipping & show progress
-    const zipProgressHandler = (metadata) => { downloadButtonElement.innerHTML = `Zipping<br>(${metadata.percent.toFixed()}%)`; };
-    const zipBlob = await zip.generateAsync({ type: "blob", progress: zipProgressHandler });
+    const zipProgressHandler = (metadata) => { downloadButtonElement.innerHTML = `Zipping<br>(${metadata.percent.toFixed()}%)`; }
+    const content = await zip.generateAsync({ type: "blob" }, zipProgressHandler);
 
-    // save zip file
-    saveAs(zipBlob, `${zipTitle}.zip`);
+    // open 'Save As' window to save
+    saveAs(content, `${zipTitle}.zip`);
+
+    // all completed
+    downloadButtonElement.textContent = "Completed";
   }
 
-  return { init }
-})(window.JSZip, window.saveAs);
+  // handle promise fulfilled
+  function fulfillHandler(res) {
+    if (!isErrorOccurred) {
+      fulfillCount++;
+      downloadButtonElement.innerHTML = `Processing<br>(${fulfillCount}/${promiseCount})`;
+    }
 
-// Example usage of the ImageDownloader
-ImageDownloader.init({
-  maxImageAmount: 100,  // Replace with your total number of images
-  getImagePromises: (from, to) => { 
-    // Your function to fetch image promises goes here
-    return fetchImages(from, to);  // Example placeholder function
-  },
-  title: "my_images", 
-  imageSuffix: 'webp',
-  zipOptions: {},
-  positionOptions: { top: '100px', left: '50px' }
-});
+    return res;
+  }
+
+  // handle promise rejected
+  function rejectHandler(err) {
+    isErrorOccurred = true;
+    console.error(err);
+
+    downloadButtonElement.textContent = 'Error Occurred';
+    downloadButtonElement.style.backgroundColor = 'red';
+
+    return Promise.reject(err);
+  }
+
+  return { init, fulfillHandler, rejectHandler };
+})(window);
