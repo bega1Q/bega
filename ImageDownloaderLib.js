@@ -47,8 +47,8 @@
     // setup UI
     setupUI(positionOptions);
 
-    // // setup update notification
-    // setupUpdateNotification();
+    // setup update notification
+    setupUpdateNotification();
 
     // add click event listener to download button
     downloadButtonElement.onclick = function () {
@@ -288,7 +288,7 @@
     }
 
     // start zipping & show progress
-    const zipProgressHandler = (metadata) => { downloadButtonElement.innerHTML = `Empaquetando<br>(${metadata.percent.toFixed()}%)`; };
+    const zipProgressHandler = (metadata) => { downloadButtonElement.innerHTML = `Zipping<br>(${metadata.percent.toFixed()}%)`; };
     const zipBlob = await zip.generateAsync({ type: "blob", progress: zipProgressHandler });
 
     // save zip file
