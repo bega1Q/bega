@@ -278,6 +278,10 @@
     }
 
     // configure file structure of zip archive
+    if (typeof JSZip === 'undefined') {
+    console.error('JSZip is not defined. Make sure it is properly imported.');
+  } else {
+    // Configura la fecha por defecto para los archivos en el zip
     JSZip.defaults.date = new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000);
     const zip = new JSZip();
     const zipTitle = title.replaceAll(/\/|\\|\:|\*|\?|\"|\<|\>|\|/g, ''); // remove some characters
