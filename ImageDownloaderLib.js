@@ -32,30 +32,11 @@
   const externalLinkSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentcolor" width="16" height="16"><path fill-rule="evenodd" d="M10.604 1h4.146a.25.25 0 01.25.25v4.146a.25.25 0 01-.427.177L13.03 4.03 9.28 7.78a.75.75 0 01-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0110.604 1zM3.75 2A1.75 1.75 0 002 3.75v8.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 12.25v-3.5a.75.75 0 00-1.5 0v3.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-8.5a.25.25 0 01.25-.25h3.5a.75.75 0 000-1.5h-3.5z"></path></svg>`;
   const reloadSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentcolor" width="16" height="16"><path fill-rule="evenodd" d="M8 2.5a5.487 5.487 0 00-4.131 1.869l1.204 1.204A.25.25 0 014.896 6H1.25A.25.25 0 011 5.75V2.104a.25.25 0 01.427-.177l1.38 1.38A7.001 7.001 0 0114.95 7.16a.75.75 0 11-1.49.178A5.501 5.501 0 008 2.5zM1.705 8.005a.75.75 0 01.834.656 5.501 5.501 0 009.592 2.97l-1.204-1.204a.25.25 0 01.177-.427h3.646a.25.25 0 01.25.25v3.646a.25.25 0 01-.427.177l-1.38-1.38A7.001 7.001 0 011.05 8.84a.75.75 0 01.656-.834z"></path></svg>`;
 
-  // Get title and chapter
-  const mangaTitle = document.querySelector('.col-12');
-  // const chapterNumber = document.querySelector('.col-12');
-
-  if (mangaTitle) {
-  const mangaTag = mangaTitle.querySelector('h1');
-
-  // Check if the class and tag exist.
-  if (mangaTag) {
-    const contents = mangaTag.textContent || mangaTag.innerText;
-    console.log(contents);
-  } else {
-    console.error('No se encontró la etiqueta específica dentro del elemento con la clase ".col-12".');
-  }
- } else {
-  console.error('No se encontró ningún elemento con la clase ".col-12".');
-}
-
   // initialization
   function init({
     maxImageAmount,
     getImagePromises,
-    mangaTitle,
-    // title = `package_${Date.now()}`,
+    title = `package_${Date.now()}`,
     imageSuffix = 'webp',
     zipOptions = {},
     positionOptions = {}
@@ -74,7 +55,7 @@
       this.textContent = "Procesando";
       this.style.backgroundColor = '#aaa';
       this.style.cursor = 'not-allowed';
-      download(getImagePromises, mangaTitle, imageSuffix, zipOptions);
+      download(getImagePromises, title, imageSuffix, zipOptions);
     }
   }
 
@@ -216,7 +197,7 @@
   }
 
   // start downloading
-  async function download(getImagePromises, mangaTitle, imageSuffix, zipOptions) {
+  async function download(getImagePromises, title, imageSuffix, zipOptions) {
     const startNum = Number(startNumInputElement.value);
     const endNum = Number(endNumInputElement.value);
     promiseCount = endNum - startNum + 1;
@@ -237,7 +218,9 @@
     // configure file structure of zip archive
     JSZip.defaults.date = new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000);
     const zip = new JSZip();
-    const zipTitle = mangaTitle.replaceAll(/\/|\\|\:|\*|\?|\"|\<|\>|\|/g, ''); // remove some characters
+    const zipTitle = title.replaceAll(/\/|\\|\:|\*|\?|\"|\<|\>|\|/g, ''); // remove some characters
+    title.replaceAll(/|ZonaTMO/g, '');
+    title.replaceAll(/\s/g, '_');
     const folder = zip.folder(zipTitle);
     for (const [index, image] of images.entries()) {
       const filename = `${String(index + 1).padStart(images.length >= 100 ? String(images.length).length : 2, '0')}.${imageSuffix}`;
