@@ -48,7 +48,7 @@
     setupUI(positionOptions);
 
     // setup update notification
-    // setupUpdateNotification();
+    setupUpdateNotification();
 
     // add click event listener to download button
     downloadButtonElement.onclick = function () {
@@ -185,64 +185,64 @@
     document.body.appendChild(panelElement);
   }
 
-  // // setup update notification
-  // async function setupUpdateNotification() {
-  //   if (typeof GM_info === 'undefined' || typeof GM_xmlhttpRequest === 'undefined') return;
+  // setup update notification
+  async function setupUpdateNotification() {
+    if (typeof GM_info === 'undefined' || typeof GM_xmlhttpRequest === 'undefined') return;
 
-  //   // get local version
-  //   const localVersion = Number(GM_info.script.version);
+    // get local version
+    const localVersion = Number(GM_info.script.version);
 
-  //   // get latest version
-  //   const scriptID = (GM_info.script.homepageURL || GM_info.script.homepage).match(/scripts\/(?<id>\d+)-/)?.groups?.id;
-  //   const scriptURL = `https://update.greasyfork.org/scripts/${scriptID}/raw.js`;
-  //   const latestVersionString = await new Promise(resolve => {
-  //     GM_xmlhttpRequest({
-  //       method: 'GET',
-  //       url: scriptURL,
-  //       responseType: 'text',
-  //       onload: res => resolve(res.response.match(/@version\s+(?<version>[0-9\.]+)/)?.groups?.version)
-  //     });
-  //   });
-  //   const latestVersion = Number(latestVersionString);
+    // get latest version
+    const scriptID = (GM_info.script.homepageURL || GM_info.script.homepage).match(/scripts\/(?<id>\d+)-/)?.groups?.id;
+    const scriptURL = `https://update.greasyfork.org/scripts/${scriptID}/raw.js`;
+    const latestVersionString = await new Promise(resolve => {
+      GM_xmlhttpRequest({
+        method: 'GET',
+        url: scriptURL,
+        responseType: 'text',
+        onload: res => resolve(res.response.match(/@version\s+(?<version>[0-9\.]+)/)?.groups?.version)
+      });
+    });
+    const latestVersion = Number(latestVersionString);
 
-  //   if (Number.isNaN(localVersion) || Number.isNaN(latestVersion)) return;
-  //   if (latestVersion <= localVersion) return;
+    if (Number.isNaN(localVersion) || Number.isNaN(latestVersion)) return;
+    if (latestVersion <= localVersion) return;
 
-  //   // show update notification
-  //   const updateLinkElement = document.createElement('a');
-  //   updateLinkElement.id = 'ImageDownloader-UpdateLink';
-  //   updateLinkElement.href = scriptURL.replace('raw.js', 'raw.user.js');
-  //   updateLinkElement.innerHTML = `Update to V${latestVersionString}${externalLinkSVG}`;
-  //   updateLinkElement.style = `
-  //     position: absolute;
-  //     bottom: -38px;
-  //     left: -1px;
+    // show update notification
+    const updateLinkElement = document.createElement('a');
+    updateLinkElement.id = 'ImageDownloader-UpdateLink';
+    updateLinkElement.href = scriptURL.replace('raw.js', 'raw.user.js');
+    updateLinkElement.innerHTML = `Update to V${latestVersionString}${externalLinkSVG}`;
+    updateLinkElement.style = `
+      position: absolute;
+      bottom: -38px;
+      left: -1px;
 
-  //     display: flex;
-  //     justify-content: space-around;
-  //     align-items: center;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
 
-  //     box-sizing: border-box;
-  //     padding: 8px;
-  //     width: 146px;
-  //     height: 32px;
+      box-sizing: border-box;
+      padding: 8px;
+      width: 146px;
+      height: 32px;
 
-  //     font-size: 14px;
-  //     font-family: 'Consolas', 'Monaco', 'Microsoft YaHei';
-  //     text-decoration: none;
-  //     color: white;
+      font-size: 14px;
+      font-family: 'Consolas', 'Monaco', 'Microsoft YaHei';
+      text-decoration: none;
+      color: white;
 
-  //     background-color: #32CD32;
-  //     border-radius: 4px;
-  //   `;
-  //   updateLinkElement.onclick = () => setTimeout(() => {
-  //     updateLinkElement.removeAttribute('href');
-  //     updateLinkElement.innerHTML = `Please Reload${reloadSVG}`;
-  //     updateLinkElement.style.cursor = 'default';
-  //   }, 1000);
+      background-color: #32CD32;
+      border-radius: 4px;
+    `;
+    updateLinkElement.onclick = () => setTimeout(() => {
+      updateLinkElement.removeAttribute('href');
+      updateLinkElement.innerHTML = `Please Reload${reloadSVG}`;
+      updateLinkElement.style.cursor = 'default';
+    }, 1000);
 
-  //   panelElement.appendChild(updateLinkElement);
-  // }
+    panelElement.appendChild(updateLinkElement);
+  }
 
   // check validity of page nums from input
   function isOKToDownload() {
@@ -278,10 +278,6 @@
     }
 
     // configure file structure of zip archive
-    if (typeof JSZip === 'undefined') {
-    console.error('JSZip is not defined. Make sure it is properly imported.');
-  } else {
-    // Configura la fecha por defecto para los archivos en el zip
     JSZip.defaults.date = new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000);
     const zip = new JSZip();
     const zipTitle = title.replaceAll(/\/|\\|\:|\*|\?|\"|\<|\>|\|/g, ''); // remove some characters
