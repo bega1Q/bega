@@ -218,9 +218,12 @@
     // configure file structure of zip archive
     JSZip.defaults.date = new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000);
     const zip = new JSZip();
-    const zipTitle = title.replaceAll(/\/|\\|\:|\*|\?|\"|\<|\>|\|/g, ''); // remove some characters
-    title.replaceAll(/|ZonaTMO/g, '');
-    title.replaceAll(/\s/g, '_');
+    const zipTitle = title // remove some characters
+    .replaceAll(/\/|\\|\:|\*|\?|\"|\<|\>|\|/g, '')
+    .replaceAll(/\-\s|\-\-+/g, '')
+    .replaceAll(/ZonaTMO/g, '')
+    .replaceAll(/\s+/g, '_')
+    .replace(/_+$/g, '');
     const folder = zip.folder(zipTitle);
     for (const [index, image] of images.entries()) {
       const filename = `${String(index + 1).padStart(images.length >= 100 ? String(images.length).length : 2, '0')}.${imageSuffix}`;
