@@ -36,7 +36,7 @@
   function init({
     maxImageAmount,
     getImagePromises,
-    title = `package_${Date.now()}`,
+    title = `paquete_${Date.now()}`,
     imageSuffix = 'webp',
     zipOptions = {},
     positionOptions = {}
@@ -217,6 +217,8 @@
 
     // configure file structure of zip archive
     JSZip.defaults.date = new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000);
+    console.log(title);
+    
     const zip = new JSZip();
     const zipTitle = title // remove some characters
     .replaceAll(/\/|\\|\:|\*|\?|\"|\<|\>|\|/g, '')
