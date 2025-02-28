@@ -202,9 +202,9 @@
     const endNum = Number(endNumInputElement.value);
     promiseCount = endNum - startNum + 1;
 
-    // start downloading images, max amount of concurrent requests is limited to 8
+    // start downloading images, max amount of concurrent requests is limited to 4
     let images = [];
-    for (let num = startNum; num <= endNum; num += 8) {
+    for (let num = startNum; num <= endNum; num += 4) {
       const from = num;
       const to = Math.min(num + 3, endNum);
       try {
