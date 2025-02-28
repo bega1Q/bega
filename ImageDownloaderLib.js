@@ -223,7 +223,8 @@
     .replaceAll(/\-\s|\-\-+/g, '')
     .replaceAll(/ZonaTMO/g, '')
     .replaceAll(/\s+/g, '_')
-    .replace(/_+$/g, '');
+    .replace(/_+$/g, '')
+    .replace(/^_+/g, '');
     const folder = zip.folder(zipTitle);
     for (const [index, image] of images.entries()) {
       const filename = `${String(index + 1).padStart(images.length >= 100 ? String(images.length).length : 2, '0')}.${imageSuffix}`;
