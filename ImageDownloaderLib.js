@@ -54,6 +54,7 @@
   function init({
     maxImageAmount,
     getImagePromises,
+    mangaTitle,
     // title = `package_${Date.now()}`,
     imageSuffix = 'webp',
     zipOptions = {},
